@@ -76,10 +76,22 @@ namespace BulkyWeb.Controllers
 
         public IActionResult Delete(int? id)
         {
+
             if (id == null || id <= 0)
             {
                 return NotFound();
             }
+            ///////////////// new way without view
+            Category obj = _dbContext.Categories.Find(id);
+            if (obj == null)
+            {
+                return NotFound();
+            }
+            _dbContext.Categories.Remove(obj);
+            _dbContext.SaveChanges();
+            TempData["success"] = "Category Deleted Successfully";
+            return RedirectToAction("Index");
+            ///////////////
             Category? category = _dbContext.Categories.Find(id);
             if (category == null)
             {
