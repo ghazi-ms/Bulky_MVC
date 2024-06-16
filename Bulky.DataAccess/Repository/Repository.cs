@@ -20,22 +20,37 @@ namespace Bulky.DataAccess.Repository
 			// i take the set or 'collection' from my db
 			_db = db;           
 			this.dbset=_db.Set<T>();
+			_db.Products.Include(u => u.Category).Include(u => u.CategoryID);
         }
 
-        public IEnumerable<T> GetAll()
+        public IEnumerable<T> GetAll(string? includeProperties=null)
 		{
 			//get the whole set and return it
 			IQueryable<T> query = dbset;
-			return query.ToList();
+            if (!string.IsNullOrEmpty(includeProperties))
+            {
+                foreach (var propertie in includeProperties.Split(new char[] {','},StringSplitOptions.RemoveEmptyEntries))
+                {
+                    query=query.Include(propertie);
+                }
+            }
+            return query.ToList();
 		}
 
-		public T Get(Expression<Func<T, bool>> filter)
+		public T Get(Expression<Func<T, bool>> filter, string? includeProperties = null)
 		{
 			// this where i set the whole set to query
 			// then tell it to loop on it using my condition
 			// and get the first match or default
 			IQueryable<T> query = dbset;
 			query=query.Where(filter);
+			if (!string.IsNullOrEmpty(includeProperties))
+			{
+				foreach (var propertie in includeProperties.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+				{
+					query = query.Include(propertie);
+				}
+			}
 			return query.FirstOrDefault();
 		}
 
