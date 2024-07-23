@@ -9,7 +9,6 @@
                 <div class="mb-5">
                     <h2 class="display-5 fw-bold text-center">Sign up</h2>
                     <p class="text-center m-0">Don you have an account? <a asp-page="./Login" asp-route-returnUrl="@Model.ReturnUrl">Sign in</a></p>
-                    <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
                 </div>
             </div>
         </div>
@@ -17,6 +16,8 @@
             <div class="col-12 col-lg-10 col-xl-8">
                 <form id="registerForm" asp-route-returnUrl="@Model.ReturnUrl" method="post">
                     <div class="row gy-3">
+                        <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+
                         <div class="col-md-6">
                             <div class="form-floating mb-3">
                                 <input type="text" asp-for="Input.FirstName" class="form-control" aria-required="true" placeholder="First Name" autocomplete="off" required>
@@ -101,6 +102,17 @@
                                 </select>
                             </div>
                         </div>
+
+                        @if (Model.Input.UserNames != null && Model.Input.UserNames.Any())
+                        {
+                            <div class="col-12">
+                                <div class="form-floating mb-3">
+                                    <select asp-for="Input.UserName" asp-items="@(Model.Input.UserNames)" class="form-select">
+                                        <option disabled selected>Select User Name</option>
+                                    </select>
+                                </div>
+                            </div>
+                        }
                         <div class="col-12">
                             <div class="d-grid">
                                 <button id="registerSubmit" type="submit" class="w-100 btn btn-lg btn-primary">Register</button>

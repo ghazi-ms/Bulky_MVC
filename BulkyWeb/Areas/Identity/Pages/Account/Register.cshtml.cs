@@ -20,6 +20,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Routing.Matching;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
 
@@ -125,6 +126,8 @@ namespace BulkyWeb.Areas.Identity.Pages.Account
             public string? City { get; set; }
             public string? StreetAddress { get; set; }
             public string? PostalCode { get; set; }
+            public string? UserName { get; set; }
+            public IEnumerable<SelectListItem> UserNames { get; set; }
 
         }
 
@@ -157,13 +160,21 @@ namespace BulkyWeb.Areas.Identity.Pages.Account
         {
             returnUrl ??= Url.Content("~/");
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
+            bool dupUserName=false;
+            string fname=Input.FirstName,lname=Input.LastName;
             if (ModelState.IsValid)
             {
+                string username = Input.UserName ?? Input.FirstName + "." + Input.LastName;
                 var user = CreateUser();
-                await _userStore.SetUserNameAsync(user, Input.FirstName + "." + Input.LastName, CancellationToken.None);
+                await _userStore.SetUserNameAsync(user, username, CancellationToken.None);
                 await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
+                user.Name= Input.FirstName+" "+Input.LastName;
+                user.StreetAddress= Input.StreetAddress;
+                user.City= Input.City;
+                user.PostalCode= Input.PostalCode;
+                user.State= Input.State;
+                user.PhoneNumber= Input.PhoneNumber;
                 var result = await _userManager.CreateAsync(user, Input.Password);
-
                 if (result.Succeeded)
                 {
                     _logger.LogInformation("User created a new account with password.");
@@ -202,6 +213,10 @@ namespace BulkyWeb.Areas.Identity.Pages.Account
                 foreach (var error in result.Errors)
                 {
                     ModelState.AddModelError(string.Empty, error.Description);
+                    if (error.Code == "DuplicateUserName")
+                    {
+                        dupUserName = true;
+                    }
                 }
             }
             Input = new()
@@ -212,8 +227,35 @@ namespace BulkyWeb.Areas.Identity.Pages.Account
                     Value = i
                 })
             };
+            if (dupUserName)
+            {
+                Input.UserNames = (IEnumerable<SelectListItem>) GenerateUniqueUsername(fname, lname);
+            }
             // If we got this far, something failed, redisplay form
             return Page();
+        }
+        private IEnumerable<SelectListItem> GenerateUniqueUsername(string firstName, string lastName)
+        {
+            Random random = new Random();
+            List<SelectListItem> userNames = new List<SelectListItem>(); // Use List for modification
+            List<string> modifiers = new List<string> { "__", "-", "^", random.Next(1, 100).ToString(), "@", "@" + random.Next(1, 100).ToString() };
+
+            for (int i = 0; i < 6; i++)
+            {
+                string username = $"{modifiers[i]}{firstName.ToLower()}.{lastName.ToLower()}{modifiers[i]}";
+
+                if ( _userManager.FindByNameAsync(username).Result == null) // Await the async method
+                {
+                    SelectListItem item = new SelectListItem
+                    {
+                        Text = username,
+                        Value = username
+                    };
+                    userNames.Add(item); // Add items to the List
+                }
+            }
+
+            return userNames;
         }
 
         private ApplicationUser CreateUser()
