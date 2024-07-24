@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Identity;
 using BulkyBook.Uitlity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.Extensions.Options;
+using BulkyWeb.Areas.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,7 +18,11 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     );
 
 //builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true).AddEntityFrameworkStores<ApplicationDbContext>();
-builder.Services.AddIdentity<IdentityUser,IdentityRole>().AddEntityFrameworkStores<ApplicationDbContext>().AddDefaultTokenProviders();
+builder.Services.AddIdentity<IdentityUser,IdentityRole>(options =>
+{
+    options.User.RequireUniqueEmail = true;
+}).AddEntityFrameworkStores<ApplicationDbContext>().AddDefaultTokenProviders();
+builder.Services.AddScoped<IUserValidator<IdentityUser>, CustomUserValidator>();
 builder.Services.ConfigureApplicationCookie(options =>
     {
         options.LoginPath = $"/Identity/Account/Login";

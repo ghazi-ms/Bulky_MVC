@@ -105,7 +105,7 @@ namespace BulkyWeb.Areas.Identity.Pages.Account.Manage
                 var setPhoneResult = await _userManager.SetPhoneNumberAsync(user, Input.PhoneNumber);
                 if (!setPhoneResult.Succeeded)
                 {
-                    StatusMessage = "Unexpected error when trying to set phone number.";
+                    StatusMessage = setPhoneResult.Errors.First().Description;
                     return RedirectToPage();
                 }
             }

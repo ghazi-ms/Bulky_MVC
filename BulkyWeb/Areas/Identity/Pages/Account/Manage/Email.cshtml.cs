@@ -113,8 +113,14 @@ namespace BulkyWeb.Areas.Identity.Pages.Account.Manage
             }
 
             var email = await _userManager.GetEmailAsync(user);
+            var found = _userManager.FindByEmailAsync(Input.NewEmail);
+            if (found != null && user.Id != found.Result.Id) {
+                StatusMessage = "Email Is Already Taken.";
+                return RedirectToPage();
+            }
             if (Input.NewEmail != email)
             {
+
                 var userId = await _userManager.GetUserIdAsync(user);
                 var code = await _userManager.GenerateChangeEmailTokenAsync(user, Input.NewEmail);
                 code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));

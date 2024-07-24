@@ -16,7 +16,7 @@
             <div class="col-12 col-lg-10 col-xl-8">
                 <form id="registerForm" asp-route-returnUrl="@Model.ReturnUrl" method="post">
                     <div class="row gy-3">
-                        <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+                        <div asp-validation-summary="All" class="text-danger" role="alert"></div>
 
                         <div class="col-md-6">
                             <div class="form-floating mb-3">
@@ -30,6 +30,13 @@
                                 <input type="text" asp-for="Input.LastName" class="form-control" aria-required="true" placeholder="Last Name" autocomplete="off" required>
                                 <label asp-for="Input.LastName" class="form-label">Last Name</label>
                                 <span asp-validation-for="Input.LastName" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="form-floating mb-3">
+                                <input type="text" asp-for="Input.UserName" class="form-control" aria-required="true" placeholder="UserName" autocomplete="off" required >
+                                <label asp-for="Input.UserName" class="form-label" >User Name</label>
+                                <span asp-validation-for="Input.UserName" class="text-danger"></span>
                             </div>
                         </div>
                         <div class="col-md-6">

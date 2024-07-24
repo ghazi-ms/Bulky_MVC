@@ -17,6 +17,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -120,7 +121,7 @@ namespace BulkyWeb.Areas.Identity.Pages.Account
             public string FirstName { get; set; }
 			[Required]
 			public string LastName { get; set; }
-
+            
 			public string? PhoneNumber { get; set; }
             public string? State { get; set; }
             public string? City { get; set; }
@@ -229,15 +230,21 @@ namespace BulkyWeb.Areas.Identity.Pages.Account
             };
             if (dupUserName)
             {
-                Input.UserNames = (IEnumerable<SelectListItem>) GenerateUniqueUsername(fname, lname);
+                List<string> userNames = GenerateUniqueUsername(fname, lname);
+                ModelState.AddModelError(string.Empty, "Suggested User Names.");
+                foreach (var name in userNames)
+                {
+                    ModelState.AddModelError(string.Empty, name);
+
+                }
             }
             // If we got this far, something failed, redisplay form
             return Page();
         }
-        private IEnumerable<SelectListItem> GenerateUniqueUsername(string firstName, string lastName)
+        private List<string> GenerateUniqueUsername(string firstName, string lastName)
         {
             Random random = new Random();
-            List<SelectListItem> userNames = new List<SelectListItem>(); // Use List for modification
+            List<string> userNames = [];
             List<string> modifiers = new List<string> { "__", "-", "^", random.Next(1, 100).ToString(), "@", "@" + random.Next(1, 100).ToString() };
 
             for (int i = 0; i < 6; i++)
@@ -246,13 +253,8 @@ namespace BulkyWeb.Areas.Identity.Pages.Account
 
                 if ( _userManager.FindByNameAsync(username).Result == null) // Await the async method
                 {
-                    SelectListItem item = new SelectListItem
-                    {
-                        Text = username,
-                        Value = username
-                    };
-                    userNames.Add(item); // Add items to the List
-                }
+                    userNames.Add(username);
+                        }
             }
 
             return userNames;
