@@ -15,6 +15,7 @@ namespace Bulky.DataAccess.Data
 
         public DbSet<Category> Categories{ get; set; }
         public DbSet<Product> Products { get; set; }
+        public DbSet<Company> Companies { get; set; }
 		public DbSet<ApplicationUser> ApplicationUsers { get; set; }
 
 
@@ -110,6 +111,11 @@ namespace Bulky.DataAccess.Data
                 }
 
             );
-        }
+			modelBuilder.Entity<Company>().HasData(
+			   new Company { Id = 1, Name = "Tech solutions", City="Amman",PostalCode="11201" ,State="Amman",StreetAddress="123 ,Amman St",PhoneNumber="07969999999"},
+			   new Company { Id = 2, Name = "Blue Tech", City = "Zarqa", PostalCode = "44201", State = "Zarqa", StreetAddress = "555 ,Rawnaq St", PhoneNumber = "065521355" },
+			   new Company { Id = 3, Name = "North Solutions", City = "Irbid", PostalCode = "63333", State = "Irbid", StreetAddress = "Karag St", PhoneNumber = "062214444" }
+		   );
+		}
     }
 }

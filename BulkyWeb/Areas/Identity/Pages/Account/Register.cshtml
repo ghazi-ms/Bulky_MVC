@@ -109,7 +109,13 @@
                                 </select>
                             </div>
                         </div>
-
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3">
+                                <select asp-for="Input.CompanyId" asp-items="@Model.Input.Companies" class="form-select" >
+                                    <option disabled selected>Select Company</option>
+                                </select>
+                            </div>
+                        </div>
                         @if (Model.Input.UserNames != null && Model.Input.UserNames.Any())
                         {
                             <div class="col-12">
@@ -168,6 +174,18 @@
 
 @section Scripts {
 	<partial name="_ValidationScriptsPartial" />
+    <script>
+        $('#Input_CompanyId').hide();
+        $('#Input_Role').change(function () {
+            let val = $('#Input_Role option:selected').text();
+            if (val == "Company") {
+                $('#Input_CompanyId').show();
+            }else{
+                $('#Input_CompanyId').hide();
+
+            }
+        });
+    </script>
 }
 
 
